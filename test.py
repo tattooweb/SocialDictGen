@@ -49,6 +49,7 @@ def parse_args():
 
 	#gendict
 	gendict = parser.add_argument_group('GEN_DICT')
+	#level定义生成字典的阶数，必选参数，默认为1，只能输入1,2,3
 	gendict.add_argument("--level",type=int,choices=[1,2,3],help="[REQUIRED]the level of dict",default=1)
 	gendict.add_argument("-u","--username",type=str)
 	gendict.add_argument("-p","--password",type=str)
@@ -114,11 +115,20 @@ def get_abbreviation(cname):
 #func处理命令行参数,并转为列表类型
 def get_args():
 	args_list = []
+
 	#处理参数-用户名
-	username = args.username
+	username = []
+	if args.username:
+		username.append(args.username)
+	else:
+		username = ""
 
 	#处理参数-密码
-	password = args.password
+	password = []
+	if args.password:
+		password.append(args.password)
+	else:
+		password = ""
 
 	#处理参数-中文名
 	cname = []
@@ -152,7 +162,7 @@ def get_args():
 		ename.append(ename_init_upper)
 		ename.append(ename_upper)
 	else:
-		cname = ""
+		ename = ""
 
 	#处理参数-电话号码
 	tel = []
@@ -238,9 +248,10 @@ def get_args():
 		mail = ""
 
 	#处理参数-qq
+	qq = []
 	if args.qq:
 		if args.qq.isnumeric():
-			qq = args.qq
+			qq.append(args.qq)
 		else:
 			print("输入qq错误！")
 			sys.exit()
@@ -256,6 +267,7 @@ def get_args():
 	args_list.append(birthday)
 	args_list.append(mail)
 	args_list.append(qq)
+	# print(args_list)
 	return args_list
 
 #func将命令行参数传给实例对象
@@ -314,7 +326,7 @@ def gendict_rank_one(person):
 					password_list.append(attr_list)
 					password_dict.write(str(attr_list)+'\n')
 					total += 1
-	print(password_list)
+	# print(password_list)
 	#组合两项个人信息
 	for i in range(len(password_list)):
 		#分别在两项个人信息之间和后面加入特殊字符列表中的一个字符
@@ -423,19 +435,15 @@ if __name__ == "__main__":
     #生成密码字典
     # print(get_abbreviation(u"李二狗"))   #后面字符串以 Unicode 格式 进行编码，一般用在中文字符串前面，防止因为源码储存格式问题，导致再次使用时出现乱码。
 
-    if not args.level:
-    	print(ERROR_TIPS + "请选择生成字典的阶数！[usage: --level {1,2,3}]")
-    elif args.level == 1:
-    	#一阶密码：仅根据一项个人信息生成的密码
-    	print("一阶字典" + PROCESS)
-    	gendict_rank_one(person)
+    if args.level == 1:
+        #一阶密码：仅根据一项个人信息生成的密码
+        print("一阶字典" + PROCESS)
+        gendict_rank_one(person)
     elif args.level == 2:
-    	#二阶密码：根据两项个人信息组合生成的密码
-    	print("二阶字典" + PROCESS)
-    	gendict_rank_two(person)
+        #二阶密码：根据两项个人信息组合生成的密码
+        print("二阶字典" + PROCESS)
+        gendict_rank_two(person)
     elif args.level == 3:
-    	#三阶密码
-    	print("三阶字典" + PROCESS)
-    	gendict_rank_three(person)
-    else:
-    	sys.exit(0)
+        #三阶密码：二阶基础上，在两项个人信息中间或后面加入一个特殊字符
+        print("三阶字典" + PROCESS)
+        gendict_rank_three(person)
