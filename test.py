@@ -44,23 +44,23 @@ def str_pic():
 #     parser.add_argument("-m","--mail",type=str)
 #     parser.add_argument("-q","--qq",type=str)
 #     return parser.parse_args()
-def parse_args():
-	parser = argparse.ArgumentParser(epilog='\tExample: \r\npython3 ' + sys.argv[0] + " -u username [options...]")
+
+def command_args():
+	parser = argparse.ArgumentParser(epilog='\tExample: \r\npython3 ' + sys.argv[0] + " --level {1,2,3} [-u username [options...]]")
 
 	#gendict
 	gendict = parser.add_argument_group('GEN_DICT')
 	#level定义生成字典的阶数，必选参数，默认为1，只能输入1,2,3
-	gendict.add_argument("--level",type=int,choices=[1,2,3],help="[REQUIRED]the level of dict",default=1)
-	gendict.add_argument("-u","--username",type=str)
-	gendict.add_argument("-p","--password",type=str)
-	gendict.add_argument("-cn","--cname",type=str)
-	gendict.add_argument("-en","--ename",type=str)
-	gendict.add_argument("-t","--tel",type=str)
-	gendict.add_argument("-id","--idcard",type=str)
-	gendict.add_argument("-b","--birthday",help='Example: 19990523 or 0523')
-	gendict.add_argument("-m","--mail",type=str)
-	gendict.add_argument("-q","--qq",type=str)
-
+	gendict.add_argument("--level",type=int,choices=[1,2,3],help="[REQUIRED]the level of dict")
+	gendict.add_argument("-u","--username",type=str,action = "store")
+	gendict.add_argument("-p","--password",type=str,action = "store")
+	gendict.add_argument("-cn","--cname",type=str,action = "store")
+	gendict.add_argument("-en","--ename",type=str,action = "store")
+	gendict.add_argument("-t","--tel",type=str,action = "store")
+	gendict.add_argument("-id","--idcard",type=str,action = "store")
+	gendict.add_argument("-b","--birthday",help='Example: 19990523 or 0523',action = "store")
+	gendict.add_argument("-m","--mail",type=str,action = "store")
+	gendict.add_argument("-q","--qq",type=str,action = "store")
 
 	#CAPTCHA_OCR-optical character recognition 
 	CAPTCHA_OCR = parser.add_argument_group('CAPTCHA_OCR')
@@ -70,8 +70,15 @@ def parse_args():
 	burst = parser.add_argument_group('BURST')
 	burst.add_argument('--burst',action="store")
 
-	parser.add_argument('--push', action='store')
-	return parser.parse_args()
+	# parser.add_argument('--push', action='store')
+	return parser
+
+def parse_args():
+	return command_args().parse_args()
+
+def parse_args_help(default_args = ""):
+	return command_args().parse_args(default_args)
+
 '''
 	每个参数只能传一个值
     USERNAME = ["twodog"]
@@ -267,7 +274,7 @@ def get_args():
 	args_list.append(birthday)
 	args_list.append(mail)
 	args_list.append(qq)
-	# print(args_list)
+	print(args_list)
 	return args_list
 
 #func将命令行参数传给实例对象
@@ -434,15 +441,17 @@ if __name__ == "__main__":
 
     #生成密码字典
     # print(get_abbreviation(u"李二狗"))   #后面字符串以 Unicode 格式 进行编码，一般用在中文字符串前面，防止因为源码储存格式问题，导致再次使用时出现乱码。
-
-    if args.level == 1:
-        #一阶密码：仅根据一项个人信息生成的密码
-        print("一阶字典" + PROCESS)
-        gendict_rank_one(person)
+    if not args.level:
+    	#若未设置level，提示帮助菜单
+    	parse_args_help(['-h'])
+    elif args.level == 1:
+    	#一阶密码：仅根据一项个人信息生成的密码
+    	print("一阶字典" + PROCESS)
+    	gendict_rank_one(person)
     elif args.level == 2:
-        #二阶密码：根据两项个人信息组合生成的密码
-        print("二阶字典" + PROCESS)
-        gendict_rank_two(person)
+    	#二阶密码：根据两项个人信息组合生成的密码
+    	print("二阶字典" + PROCESS)
+    	gendict_rank_two(person)
     elif args.level == 3:
         #三阶密码：二阶基础上，在两项个人信息中间或后面加入一个特殊字符
         print("三阶字典" + PROCESS)
