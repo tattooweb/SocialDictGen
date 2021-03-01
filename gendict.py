@@ -1,96 +1,7 @@
 # encoding: utf-8
-import sys,argparse
+import sys
 import pypinyin
 import re
-
-#TODO:改变输出字符颜色
-ERROR_TIPS = "[ERROR**********]"
-PROCESS = "[PROCESS++++++++++]"
-
-'''
-一阶密码：仅根据一项个人信息生成的密码
-
-二阶密码：根据两项个人信息组合生成的密码,去除低于六位的密码
-
-三阶密码：由于部分人喜欢在两项个人信息中间加入一个特殊符号，以加强密码复杂度和强度，
-为了包含这种情况，故根据两项个人信息以及一个常用的连接符号（默认：.!_-#@:$&*~?%+=/|，
-建议尽量减少连接符，否则会极大增加密码数量，甚至导致内存溢出从而生成失败）生成三阶密码
-
-
-'''
-
-#字符图
-def str_pic():
-    print(""" ____             _       _ ____  _      _    ____            
-/ ___|  ___   ___(_) __ _| |  _ \(_) ___| |_ / ___| ___ _ __  
-\___ \ / _ \ / __| |/ _` | | | | | |/ __| __| |  _ / _ \ '_ \ 
- ___) | (_) | (__| | (_| | | |_| | | (__| |_| |_| |  __/ | | |
-|____/ \___/ \___|_|\__,_|_|____/|_|\___|\__|\____|\___|_| |_|
-
-                            ------author by tattoo
-""")
-#命令行参数
-# def parse_args():
-#     parser = argparse.ArgumentParser(epilog='\tExample: \r\npython3 ' + sys.argv[0] + " -u username [options...]")
-#     #定义字典阶数
-#     parser.add_argument("--level",type=int,choices=[1,2,3],help="[REQUIRED]the level of dict",required=True)
-#     parser.add_argument("-u","--username",type=str)
-#     parser.add_argument("-p","--password",type=str)
-#     parser.add_argument("-cn","--cname",type=str)
-#     parser.add_argument("-en","--ename",type=str)
-#     parser.add_argument("-t","--tel",type=str)
-#     parser.add_argument("-id","--idcard",type=str)
-#     parser.add_argument("-b","--birthday",help='Example: 19990523 or 0523')
-#     parser.add_argument("-m","--mail",type=str)
-#     parser.add_argument("-q","--qq",type=str)
-#     return parser.parse_args()
-
-def command_args():
-    parser = argparse.ArgumentParser(epilog='\tExample: \r\npython3 ' + sys.argv[0] + " --level {1,2,3} [-u username [options...]]")
-
-    #gendict
-    gendict = parser.add_argument_group('GEN_DICT')
-    #level定义生成字典的阶数，必选参数，默认为1，只能输入1,2,3
-    gendict.add_argument("--level",type=int,choices=[1,2,3],help="[REQUIRED]the level of dict")
-    gendict.add_argument("-u","--username",type=str,action = "store")
-    gendict.add_argument("-p","--password",type=str,action = "store")
-    gendict.add_argument("-cn","--cname",type=str,action = "store")
-    gendict.add_argument("-en","--ename",type=str,action = "store")
-    gendict.add_argument("-t","--tel",type=str,action = "store")
-    gendict.add_argument("-id","--idcard",type=str,action = "store")
-    gendict.add_argument("-b","--birthday",help='Example: 19990523 or 0523',action = "store")
-    gendict.add_argument("-m","--mail",type=str,action = "store")
-    gendict.add_argument("-q","--qq",type=str,action = "store")
-
-    #CAPTCHA_OCR-optical character recognition 
-    CAPTCHA_OCR = parser.add_argument_group('CAPTCHA_OCR')
-    CAPTCHA_OCR.add_argument('--ocr',action = "store")
-
-    #BURST
-    burst = parser.add_argument_group('BURST')
-    burst.add_argument('--burst',action="store")
-
-    # parser.add_argument('--push', action='store')
-    return parser
-
-def parse_args():
-    return command_args().parse_args()
-
-def parse_args_help(default_args = ""):
-    return command_args().parse_args(default_args)
-
-'''
-    每个参数只能传一个值
-    USERNAME = ["twodog"]
-    PASSWORD = ["old_password"]
-    CN_NAME = "李二狗"
-    EN_NAME = "Bill"
-    TEL = ["13512345678"]
-    ID_CARD = "220281198309243953"
-    BIRTHDAY = ("1983", "09", "24")
-    EMAIL = ["987654321@qq.com"]
-    QQ = ["987654321"]
-'''
 
 #class定义人像类
 class Person():
@@ -265,6 +176,7 @@ def get_args():
     else:
         qq = ""
 
+
     args_list.append(username)
     args_list.append(password)
     args_list.append(cname)
@@ -414,45 +326,3 @@ def gendict_rank_three(person):
                 total += 1
     print("三阶字典共生成{}项密码".format(total))
     password_dict.close()
-
-#调用主函数
-if __name__ == "__main__":
-    str_pic()
-    #命令行参数函数
-    args = parse_args()
-    # print(args)
-
-    #获取命令行参数
-    #实例化Person
-    person = Person()
-    #获取命令行参数，并赋给对象
-    pass_args_list(person,get_args())
-
-    #测试语句-输入各个信息的分割形式
-    # print("username:{}".format(person.username))
-    # print("password:{}".format(person.password))
-    # print("cname:{}".format(person.cname))
-    # print("ename:{}".format(person.ename))
-    # print("tel:{}".format(person.tel))
-    # print("idcard:{}".format(person.idcard))
-    # print("birthday:{}".format(person.birthday))
-    # print("mail:{}".format(person.mail))
-    # print("qq:{}".format(person.qq))
-
-    #生成密码字典
-    # print(get_abbreviation(u"李二狗"))   #后面字符串以 Unicode 格式 进行编码，一般用在中文字符串前面，防止因为源码储存格式问题，导致再次使用时出现乱码。
-    if not args.level:
-        #若未设置level，提示帮助菜单
-        parse_args_help(['-h'])
-    elif args.level == 1:
-        #一阶密码：仅根据一项个人信息生成的密码
-        print("一阶字典" + PROCESS)
-        gendict_rank_one(person)
-    elif args.level == 2:
-        #二阶密码：根据两项个人信息组合生成的密码
-        print("二阶字典" + PROCESS)
-        gendict_rank_two(person)
-    elif args.level == 3:
-        #三阶密码：二阶基础上，在两项个人信息中间或后面加入一个特殊字符
-        print("三阶字典" + PROCESS)
-        gendict_rank_three(person)
